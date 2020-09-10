@@ -13,6 +13,7 @@ class Selector extends React.Component {
             allFunctions: [],
             allStructs: [],
             displayPath: "",
+            displayText: "",
             isFunctionType: true
         }
         this.handleProjectChange = this.handleProjectChange.bind(this);
@@ -23,7 +24,7 @@ class Selector extends React.Component {
     }
 
     componentDidMount() {
-        axios.get('http://127.0.0.1:8080/load/')
+        axios.get('http://www.darktalk.cn/load/')
              .then((res) => {
                  this.setState({
                      allProjectElements: res.data,
@@ -33,7 +34,6 @@ class Selector extends React.Component {
                      selectedFunction: res.data[Object.keys(res.data)[0]]["functions"][0],
                      selectedStruct: res.data[Object.keys(res.data)[0]]["structs"][0],
                  })
-                 console.log(this.state)
              })
     }
 
@@ -83,7 +83,7 @@ class Selector extends React.Component {
             "selectedStruct": this.state.selectedStruct
         }
         axios.post(
-            'http://127.0.0.1:8080/draw/',
+            'http://www.darktalk.cn/draw/',
             data,
             {
                 headers: {
@@ -91,24 +91,25 @@ class Selector extends React.Component {
                 }
             })
             .then(res => {
+                this.setState({
+                    "displayText": res.data.displayText
+                })
                 if (this.state.isFunctionType) {
                     let res = this.state.selectedFunction.split("/")
                     let path = res.join('_')
                     this.setState(
                         {
-                            "displayPath": "http://127.0.0.1:8080/resource/" + this.state.selectedProject + "/function_" + path + ".png"
+                            "displayPath": "http://www.darktalk.cn/resource/" + this.state.selectedProject + "/function_" + path + ".png"
                         }
                     )
-                    console.log(this.state)
                 } else {
                     let res = this.state.selectedStruct.split("/")
                     let path = res.join('_')
                     this.setState(
                         {
-                            "displayPath": "http://127.0.0.1:8080/resource/" + this.state.selectedProject + "/struct_" + path + ".png"
+                            "displayPath": "http://www.darktalk.cn/resource/" + this.state.selectedProject + "/struct_" + path + ".png"
                         }
                     )
-                    console.log(this.state)
                 }
             })
     }
@@ -156,7 +157,12 @@ class Selector extends React.Component {
                     </div>
                 </div>
                 <div>
-                     <img src={this.state.displayPath} />
+                    <span className="displayText">
+                        <pre>
+                        {this.state.displayText}
+                        </pre>
+                        <img  src={this.state.displayPath} />
+                    </span>
                 </div>
             </div>
         );

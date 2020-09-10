@@ -25,9 +25,6 @@ const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120,
-    },
-    selectElem: {
-        marginLeft: "5%"
     }
 }));
 
@@ -57,11 +54,7 @@ export default function App() {
                     </Container>
                 </div>
                 <Container className={classes.cardGrid} maxWidth="md">
-                    <div>
                      <Selector/>
-                    </div>
-
-
                 </Container>
             </main>
         </React.Fragment>

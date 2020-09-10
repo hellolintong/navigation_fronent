@@ -10,3 +10,10 @@
     margin-left: 2%;
 }
 
+.displayText {
+    width:600px;
+    text-align:left;
+    display:inline-block;
+    font-size: 18px;
+}
+
