@@ -17,7 +17,8 @@ class Selector extends React.Component {
             displayText: "",
             displayCodeSnippet: {},
             isFunctionType: true,
-            remoteUrl: "http://www.darktalk.cn"
+            //remoteUrl: "http://www.darktalk.cn"
+            remoteUrl: "http://127.0.0.1:8080"
         }
         this.handleProjectChange = this.handleProjectChange.bind(this);
         this.handleFunctionChange = this.handleFunctionChange.bind(this);
