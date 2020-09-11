@@ -1,5 +1,5 @@
 .selectElem {
-    margin-left: 2%;
+    margin-left: 4%;
 }
 
 .selectProject {
@@ -7,7 +7,7 @@
 }
 
 .submitBtn {
-    margin-left: 2%;
+    margin-left: 4%;
 }
 
 .displayText {
@@ -17,3 +17,6 @@
     font-size: 18px;
 }
 
+.displayImage {
+    text-align: center;
+}

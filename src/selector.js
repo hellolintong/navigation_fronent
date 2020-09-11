@@ -1,5 +1,6 @@
 import React from 'react';
 import './selector.css';
+import Highlight from "react-highlight.js";
 import axios from 'axios';
 
 class Selector extends React.Component {
@@ -14,7 +15,9 @@ class Selector extends React.Component {
             allStructs: [],
             displayPath: "",
             displayText: "",
-            isFunctionType: true
+            displayCodeSnippet: {},
+            isFunctionType: true,
+            remoteUrl: "http://www.darktalk.cn"
         }
         this.handleProjectChange = this.handleProjectChange.bind(this);
         this.handleFunctionChange = this.handleFunctionChange.bind(this);
@@ -24,7 +27,7 @@ class Selector extends React.Component {
     }
 
     componentDidMount() {
-        axios.get('http://www.darktalk.cn/load/')
+        axios.get(this.state.remoteUrl + '/load/')
              .then((res) => {
                  this.setState({
                      allProjectElements: res.data,
@@ -83,7 +86,7 @@ class Selector extends React.Component {
             "selectedStruct": this.state.selectedStruct
         }
         axios.post(
-            'http://www.darktalk.cn/draw/',
+            this.state.remoteUrl + '/draw/',
             data,
             {
                 headers: {
@@ -92,14 +95,15 @@ class Selector extends React.Component {
             })
             .then(res => {
                 this.setState({
-                    "displayText": res.data.displayText
+                    "displayText": res.data.displayText,
+                    "displayCodeSnippet": res.data.displayCodeSnippet
                 })
                 if (this.state.isFunctionType) {
                     let res = this.state.selectedFunction.split("/")
                     let path = res.join('_')
                     this.setState(
                         {
-                            "displayPath": "http://www.darktalk.cn/resource/" + this.state.selectedProject + "/function_" + path + ".png"
+                            "displayPath": this.state.remoteUrl + "/resource/" + this.state.selectedProject + "/function_" + path + ".png"
                         }
                     )
                 } else {
@@ -107,7 +111,7 @@ class Selector extends React.Component {
                     let path = res.join('_')
                     this.setState(
                         {
-                            "displayPath": "http://www.darktalk.cn/resource/" + this.state.selectedProject + "/struct_" + path + ".png"
+                            "displayPath": this.state.remoteUrl + "/resource/" + this.state.selectedProject + "/struct_" + path + ".png"
                         }
                     )
                 }
@@ -157,12 +161,17 @@ class Selector extends React.Component {
                     </div>
                 </div>
                 <div>
-                    <span className="displayText">
+                    <div className="displayImage">
+                        <img src={this.state.displayPath} />
+                    </div>
+                    <div className="displayText">
                         <pre>
                         {this.state.displayText}
                         </pre>
-                        <img  src={this.state.displayPath} />
-                    </span>
+                    </div>
+                    <div>
+                        {Object.values(this.state.displayCodeSnippet).map(v => {return <Highlight language={"golang"}>{v}</Highlight>} )}
+                    </div>
                 </div>
             </div>
         );

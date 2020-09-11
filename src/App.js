@@ -8,7 +8,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -53,9 +53,13 @@ export default function App() {
                         </Typography>
                     </Container>
                 </div>
-                <Container className={classes.cardGrid} maxWidth="md">
+                <Grid container spacing={3}>
+                    <Grid item xs={12} sm={2}/>
+                    <Grid item xs={12} sm={8}>
                      <Selector/>
-                </Container>
+                    </Grid>
+                    <Grid item xs={12} sm={2}/>
+                </Grid>
             </main>
         </React.Fragment>
     );
