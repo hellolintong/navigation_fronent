@@ -17,8 +17,8 @@ class Selector extends React.Component {
             displayText: "",
             displayCodeSnippet: {},
             isFunctionType: true,
-            //remoteUrl: "http://www.darktalk.cn"
-            remoteUrl: "http://127.0.0.1:8080"
+            display: false,
+            remoteUrl: "http://www.darktalk.cn"
         }
         this.handleProjectChange = this.handleProjectChange.bind(this);
         this.handleFunctionChange = this.handleFunctionChange.bind(this);
@@ -37,6 +37,7 @@ class Selector extends React.Component {
                      allStructs: res.data[Object.keys(res.data)[0]]["structs"],
                      selectedFunction: res.data[Object.keys(res.data)[0]]["functions"][0],
                      selectedStruct: res.data[Object.keys(res.data)[0]]["structs"][0],
+                     display: true,
                  })
              })
     }
@@ -121,6 +122,7 @@ class Selector extends React.Component {
 
     render() {
         const isFunctionType = this.state.isFunctionType;
+        const display = this.state.display;
         return (
             <div>
                 <div>
@@ -157,7 +159,12 @@ class Selector extends React.Component {
                                 </select>
                                 </span>
                             }
-                            <button className="submitBtn" onClick={this.handleSubmit}>确认</button>
+                            {
+                                display ?
+                                <button className="submitBtn" onClick={this.handleSubmit}>确认</button>
+                                :
+                                <span >加载中..</span>
+                            }
                         </div>
                     </div>
                 </div>
@@ -171,6 +178,7 @@ class Selector extends React.Component {
                         </pre>
                     </div>
                     <div>
+                        {console.log(this.state)}
                         {Object.values(this.state.displayCodeSnippet).map(v => {return <Highlight language={"golang"}>{v}</Highlight>} )}
                     </div>
                 </div>
