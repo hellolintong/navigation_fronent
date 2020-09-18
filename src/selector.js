@@ -52,7 +52,8 @@ class Selector extends React.Component {
             displayCodeSnippet: {},
             isFunctionType: true,
             display: false,
-            remoteUrl: "http://darktalk.cn"
+            remoteUrl: "http://www.darktalk.cn"
+            //remoteUrl: "http://127.0.0.1:8080"
         }
         this.handleProjectChange = this.handleProjectChange.bind(this);
         this.handleModuleChange = this.handleModuleChange.bind(this);
@@ -161,7 +162,8 @@ class Selector extends React.Component {
     handleFunctionChange(event) {
         let selectedFunction = event.target.value;
         this.setState({
-            selectedFunction: selectedFunction
+            selectedFunction: selectedFunction,
+            selectedFunctionName: selectedFunction
         });
     }
 
