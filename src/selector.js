@@ -3,67 +3,159 @@ import './selector.css';
 import Highlight from "react-highlight.js";
 import axios from 'axios';
 
+class Display extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        return (
+            <div>
+                <div className="displayImage">
+                    <img src={this.props.displayPath}/>
+                </div>
+                <div className="displayText">
+                    <pre>
+                        {this.props.displayText}
+                    </pre>
+                </div>
+                <div>
+                    {Object.values(this.props.displayCodeSnippet).map(v => {
+                        return <Highlight language={"golang"}>{v}</Highlight>
+                    })}
+                </div>
+            </div>
+        )
+    }
+}
+
 class Selector extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedProject: '',
-            selectedFunction: '',
-            selectedStruct: '',
-            allProjectElements: {},
-            allFunctions: [],
+            data: {},
+            allProjects: [],
+            allModules: [],
             allStructs: [],
+            allFunctions: [],
+            selectedProject: {},
+            selectedModule: {},
+            selectedStruct: {},
+            selectedFunction: "",
+
+            selectedProjectName: "",
+            selectedModuleName: "",
+            selectedStructName: "",
+            selectedFunctionName: "",
+
             displayPath: "",
             displayText: "",
             displayCodeSnippet: {},
             isFunctionType: true,
             display: false,
-            remoteUrl: "http://www.darktalk.cn"
+            remoteUrl: "http://darktalk.cn"
         }
         this.handleProjectChange = this.handleProjectChange.bind(this);
-        this.handleFunctionChange = this.handleFunctionChange.bind(this);
+        this.handleModuleChange = this.handleModuleChange.bind(this);
         this.handleStructChange = this.handleStructChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChangeParseType = this.handleChangeParseType.bind(this);
+        this.handleFunctionChange = this.handleFunctionChange.bind(this);
+        this.handleSubmitStruct = this.handleSubmitStruct.bind(this);
+        this.handleSubmitFunctionCallee = this.handleSubmitFunctionCallee.bind(this);
+        this.handleSubmitFunctionCaller = this.handleSubmitFunctionCaller.bind(this);
     }
 
     componentDidMount() {
         axios.get(this.state.remoteUrl + '/load/')
              .then((res) => {
-                 this.setState({
-                     allProjectElements: res.data,
-                     selectedProject: Object.keys(res.data)[0],
-                     allFunctions: res.data[Object.keys(res.data)[0]]["functions"],
-                     allStructs: res.data[Object.keys(res.data)[0]]["structs"],
-                     selectedFunction: res.data[Object.keys(res.data)[0]]["functions"][0],
-                     selectedStruct: res.data[Object.keys(res.data)[0]]["structs"][0],
-                     display: true,
-                 })
+                 console.log(res)
+                 let allProjects = Object.keys(res.data).sort();
+                 let selectedProject = res.data[allProjects[0]];
+                 let allModules = Object.keys(selectedProject).sort();
+                 let selectedModule = selectedProject[allModules[0]];
+                 let allStructs = Object.keys(selectedModule).sort();
+                 let selectedStruct = allStructs.length > 0 ? selectedModule[allStructs[0]].sort() : [];
+                 let allFunctions = selectedStruct;
+                 let selectedFunction = allFunctions.length > 0 ? allFunctions[0] : "";
+
+                 let selectedProjectName = allProjects[0];
+                 let selectedModuleName = allModules[0];
+                 let selectedStructName = allStructs[0];
+
+                 this.setState(
+                     {
+                         data: res.data,
+                         allProjects: allProjects,
+                         allModules: allModules,
+                         allStructs: allStructs,
+                         allFunctions: allFunctions,
+                         selectedProject: selectedProject,
+                         selectedModule: selectedModule,
+                         selectedStruct: selectedStruct,
+                         selectedFunction: selectedFunction,
+
+                         selectedProjectName: selectedProjectName,
+                         selectedModuleName: selectedModuleName,
+                         selectedStructName: selectedStructName,
+                         selectedFunctionName: selectedFunction,
+
+                         display: true
+                     }
+                 )
              })
     }
 
-    handleProjectChange(event) {
-        let selectedProject = event.target.value;
+    handleModuleChange(event) {
+        let selectedModuleName = event.target.value;
+        let selectedModule = this.state.selectedProject[selectedModuleName];
+        let allStructs = Object.keys(selectedModule).sort();
+        let selectedStruct = allStructs.length > 0 ? selectedModule[allStructs[0]].sort() : [];
+        let allFunctions = selectedStruct;
+        let selectedFunction = allFunctions.length > 0 ? allFunctions[0] : "";
+        let selectedStructName = allStructs[0];
 
-        this.setState({
-            selectedProject: selectedProject,
-            allFunctions: this.state.allProjectElements[selectedProject]["functions"],
-            allStructs: this.state.allProjectElements[selectedProject]["structs"],
-            selectedFunction: this.state.allProjectElements[selectedProject]["functions"][0],
-            selectedStruct: this.state.allProjectElements[selectedProject]["structs"][0],
-        });
+        this.setState(
+            {
+                allStructs: allStructs,
+                allFunctions: allFunctions,
+                selectedModule: selectedModule,
+                selectedStruct: selectedStruct,
+                selectedFunction: selectedFunction,
+
+                selectedModuleName: selectedModuleName,
+                selectedStructName: selectedStructName,
+                selectedFunctionName: selectedFunction,
+            }
+        )
     }
 
-    handleChangeParseType(event) {
-        if (event.target.value === 'parseFunction') {
-            this.setState({
-                isFunctionType: true,
-            })
-        } else {
-            this.setState({
-                isFunctionType: false,
-            })
-        }
+    handleProjectChange(event) {
+        let selectedProjectName = event.target.value;
+        let selectedProject = this.state.data[selectedProjectName];
+        let allModules = Object.keys(selectedProject);
+        let selectedModule = selectedProject[allModules[0]];
+        let allStructs = Object.keys(selectedModule);
+        let selectedStruct = allStructs.length > 0 ? selectedModule[allStructs[0]].sort() : [];
+        let allFunctions = selectedStruct;
+        let selectedFunction = allFunctions.length > 0 ? allFunctions[0] : "";
+
+        let selectedModuleName = allModules[0];
+        let selectedStructName = allStructs[0];
+
+        this.setState(
+            {
+                allModules: allModules,
+                allStructs: allStructs,
+                allFunctions: allFunctions,
+                selectedProject: selectedProject,
+                selectedModule: selectedModule,
+                selectedStruct: selectedStruct,
+                selectedFunction: selectedFunction,
+
+                selectedProjectName: selectedProjectName,
+                selectedModuleName: selectedModuleName,
+                selectedStructName: selectedStructName,
+                selectedFunctionName: selectedFunction,
+            }
+        )
     }
 
     handleFunctionChange(event) {
@@ -74,18 +166,28 @@ class Selector extends React.Component {
     }
 
     handleStructChange(event) {
-        let selectedStruct = event.target.value;
-        this.setState({
-            selectedStruct: selectedStruct
-        });
+        let selectedStructName = event.target.value;
+        let selectedStruct = this.state.selectedModule[selectedStructName].sort();
+        let allFunctions = selectedStruct;
+        let selectedFunction = allFunctions.length > 0 ? allFunctions[0] : "";
+        this.setState(
+            {
+                allFunctions: allFunctions,
+                selectedStruct: selectedStruct,
+                selectedFunction: selectedFunction,
+                selectedFunctionName: selectedFunction,
+                selectedStructName: selectedStructName,
+            }
+        )
     }
 
-    handleSubmit(event) {
+
+    handleSubmitStruct(event) {
         let data = {
-            "project": this.state.selectedProject,
-            "isFunctionType": this.state.isFunctionType,
-            "selectedFunction": this.state.selectedFunction,
-            "selectedStruct": this.state.selectedStruct
+            "project": this.state.selectedProjectName,
+            "isFunctionType": false,
+            "selectedFunction": "",
+            "selectedStruct": this.state.selectedModuleName + "/" + this.state.selectedStructName
         }
         axios.post(
             this.state.remoteUrl + '/draw/',
@@ -98,91 +200,110 @@ class Selector extends React.Component {
             .then(res => {
                 this.setState({
                     "displayText": res.data.displayText,
-                    "displayCodeSnippet": res.data.displayCodeSnippet
+                    "displayCodeSnippet": res.data.structCodeSnippet,
+                    "displayPath": this.state.remoteUrl + "/resource/" + this.state.selectedProjectName + "/struct_" + this.state.selectedModuleName + "_" + this.state.selectedStructName + ".png"
                 })
-                if (this.state.isFunctionType) {
-                    let res = this.state.selectedFunction.split("/")
-                    let path = res.join('_')
-                    this.setState(
-                        {
-                            "displayPath": this.state.remoteUrl + "/resource/" + this.state.selectedProject + "/function_" + path + ".png"
-                        }
-                    )
-                } else {
-                    let res = this.state.selectedStruct.split("/")
-                    let path = res.join('_')
-                    this.setState(
-                        {
-                            "displayPath": this.state.remoteUrl + "/resource/" + this.state.selectedProject + "/struct_" + path + ".png"
-                        }
-                    )
+            })
+    }
+
+
+    handleSubmitFunctionCallee(event) {
+        let data = {
+            "project": this.state.selectedProjectName,
+            "isFunctionType": true,
+            "selectedFunction":  this.state.selectedModuleName + "/" + this.state.selectedStructName + "/" + this.state.selectedFunctionName,
+            "selectedStruct": ""
+        }
+        axios.post(
+            this.state.remoteUrl + '/draw/',
+            data,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
                 }
+            })
+            .then(res => {
+                this.setState({
+                    "displayText": res.data.displayText,
+                    "displayCodeSnippet": res.data.calleeCodeSnippet,
+                    "displayPath": this.state.remoteUrl + "/resource/" + this.state.selectedProjectName + "/function_callee_" + this.state.selectedModuleName + "_" + this.state.selectedStructName + "_" + this.state.selectedFunctionName + ".png"
+                })
+            })
+    }
+
+    handleSubmitFunctionCaller(event) {
+        let data = {
+            "project": this.state.selectedProjectName,
+            "isFunctionType": true,
+            "selectedFunction":  this.state.selectedModuleName + "/" + this.state.selectedStructName + "/" + this.state.selectedFunctionName,
+            "selectedStruct": ""
+        }
+        axios.post(
+            this.state.remoteUrl + '/draw/',
+            data,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => {
+                this.setState({
+                    "displayText": res.data.displayText,
+                    "displayCodeSnippet": res.data.callerCodeSnippet,
+                    "displayPath": this.state.remoteUrl + "/resource/" + this.state.selectedProjectName + "/function_caller_" + this.state.selectedModuleName + "_" + this.state.selectedStructName + "_" + this.state.selectedFunctionName + ".png"
+                })
             })
     }
 
     render() {
-        const isFunctionType = this.state.isFunctionType;
-        const display = this.state.display;
         return (
             <div>
-                <div>
-                    <form>
-                        <div >
-                            <label>选择项目:  </label>
-                            <select className="selectProject" onChange={this.handleProjectChange}>
-                                {Object.keys(this.state.allProjectElements).map(v => {return <option key={v} value={v}>{v}</option>} )}
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div>
-                    <div>
-                        <div>
-                            <span>
-                                <select onChange={this.handleChangeParseType}>
-                                    <option value="parseFunction">解析函数</option>
-                                    <option value="parseStruct">解析结构体</option>
-                                </select>
-                            </span>
 
-                            {
-                                isFunctionType ?
-                                <span className="selectElem" onChange={this.handleFunctionChange}>
-                                <select>
-                                {this.state.allFunctions.map(v => {return <option key={v} value={v}>{v}</option>} )}
-                                </select>
-                                </span>
-                                :
-                                <span className="selectElem" onChange={this.handleStructChange}>
-                                <select>
+
+                        <span className="selectElem">
+                            <label>选择项目: </label>
+                            <select onChange={this.handleProjectChange}>
+                                {this.state.allProjects.map(v => {return <option key={v} value={v}>{v}</option>} )}
+                            </select>
+                        </span>
+
+                        <span className="selectElem">
+                            <label>选择模块: </label>
+                            <select onChange={this.handleModuleChange}>
+                                {this.state.allModules.map(v => {return <option key={v} value={v}>{v}</option>})}
+                             </select>
+                        </span>
+
+                        <span className="selectElem">
+                            <label>选择Struct: </label>
+                            <select onChange={this.handleStructChange}>
                                 {this.state.allStructs.map(v => {return <option key={v} value={v}>{v}</option>} )}
-                                </select>
-                                </span>
-                            }
-                            {
-                                display ?
-                                <button className="submitBtn" onClick={this.handleSubmit}>确认</button>
-                                :
-                                <span >加载中..</span>
-                            }
+                             </select>
+                       </span>
+
+                       <span className="selectElem">
+                            <label>选择Function: </label>
+                            <select onChange={this.handleFunctionChange}>
+                                {this.state.allFunctions.map(v => {return <option key={v} value={v}>{v}</option>} )}
+                             </select>
+                       </span>
+
+                        <div>
+                            <br/>
+                            <button className="selectElem" onClick={this.handleSubmitStruct}>查看结构体</button>
+
+                            <button className="selectElem" onClick={this.handleSubmitFunctionCallee}>查看函数调用</button>
+
+                            <button className="selectElem" onClick={this.handleSubmitFunctionCaller}>查看函数被调用</button>
                         </div>
-                    </div>
-                </div>
-                <div>
-                    <div className="displayImage">
-                        <img src={this.state.displayPath} />
-                    </div>
-                    <div className="displayText">
-                        <pre>
-                        {this.state.displayText}
-                        </pre>
-                    </div>
-                    <div>
-                        {console.log(this.state)}
-                        {Object.values(this.state.displayCodeSnippet).map(v => {return <Highlight language={"golang"}>{v}</Highlight>} )}
-                    </div>
-                </div>
+
+
+                        <div>
+                            <br/>
+                            <Display displayPath={this.state.displayPath}  displayText={this.state.displayText} displayCodeSnippet={this.state.displayCodeSnippet} />
+                        </div>
             </div>
+
         );
     }
 }
