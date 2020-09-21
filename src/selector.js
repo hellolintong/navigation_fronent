@@ -19,7 +19,7 @@ class Display extends React.Component {
                     </pre>
                 </div>
                 <div>
-                    {Object.values(this.props.displayCodeSnippet).map(v => {
+                    {Object.values(this.props.displayCodeSnippet).sort().map(v => {
                         return <Highlight language={"golang"}>{v}</Highlight>
                     })}
                 </div>
@@ -52,8 +52,8 @@ class Selector extends React.Component {
             displayCodeSnippet: {},
             isFunctionType: true,
             display: false,
-            remoteUrl: "http://www.darktalk.cn"
-            //remoteUrl: "http://127.0.0.1:8080"
+            //remoteUrl: "http://www.darktalk.cn"
+            remoteUrl: "http://127.0.0.1:8080"
         }
         this.handleProjectChange = this.handleProjectChange.bind(this);
         this.handleModuleChange = this.handleModuleChange.bind(this);
